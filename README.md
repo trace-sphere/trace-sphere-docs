@@ -52,6 +52,502 @@ I-->J[Angular Dashboard]
 ## Technology Stack
 Spring Boot, Angular, Kafka, Elasticsearch, PostgreSQL, Keycloak, Docker, Caddy, WebSocket.
 
+# Platform Architecture
+
+The **LogPulse Platform** is an event-driven, microservices-based application monitoring solution designed to collect, process, analyze, and visualize application logs in real time.
+
+Applications integrate with LogPulse through a lightweight Spring Boot Starter (SDK), which automatically captures HTTP requests, application logs, exceptions, and performance metrics. These events are securely transmitted to the platform, processed asynchronously using Apache Kafka, indexed into Elasticsearch, persisted in PostgreSQL, and visualized through a modern Angular dashboard.
+
+---
+
+# Design Principles
+
+The platform is designed around the following architectural principles:
+
+- Event-Driven Architecture
+- Microservices
+- Loose Coupling
+- Horizontal Scalability
+- Multi-Tenancy
+- Asynchronous Processing
+- Real-Time Monitoring
+- Secure Communication
+- High Availability
+
+---
+
+# High-Level Architecture
+
+```mermaid
+graph LR
+
+subgraph Client
+A[Client Application]
+B[LogPulse SDK]
+end
+
+subgraph Backend
+C[Log Producer Service]
+D[Apache Kafka]
+E[Log Ingestion Service]
+F[Notification Service]
+G[Authentication Service]
+end
+
+subgraph Storage
+H[(PostgreSQL)]
+I[(Elasticsearch)]
+end
+
+subgraph Frontend
+J[Angular Dashboard]
+end
+
+subgraph Identity
+K[Keycloak]
+end
+
+A --> B
+B --> C
+C --> D
+
+D --> E
+D --> F
+
+E --> H
+E --> I
+
+J --> G
+G --> K
+
+F -->|WebSocket| J
+J --> E
+```
+
+---
+
+# Complete Platform Flow
+
+```text
+                    Client Application
+                           │
+                    LogPulse SDK
+                           │
+                    HTTP REST Request
+                           │
+                           ▼
+                Log Producer Service
+                           │
+              API Key Validation
+                           │
+                           ▼
+                    Apache Kafka
+                    (Event Broker)
+                           │
+            ┌──────────────┴──────────────┐
+            │                             │
+            ▼                             ▼
+ Log Ingestion Service        Notification Service
+            │                             │
+            │                       Event Aggregation
+            │                      (1 Second Debounce)
+            │                             │
+      ┌─────┴──────┐                      │
+      ▼            ▼                      ▼
+ PostgreSQL   Elasticsearch         WebSocket
+      │            │                     │
+      └─────┬──────┘                     │
+            ▼                            ▼
+      Analytics APIs          Angular Dashboard
+```
+
+---
+
+# Architecture Components
+
+## 1. LogPulse SDK
+
+The SDK is integrated into client applications using a Spring Boot Starter.
+
+Responsibilities:
+
+- Capture HTTP Requests
+- Capture HTTP Responses
+- Capture Exceptions
+- Capture Logback Logs
+- Measure Response Time
+- Collect Metadata
+- Send Events to Producer Service
+
+---
+
+## 2. Log Producer Service
+
+Acts as the entry point of the platform.
+
+Responsibilities
+
+- Receive SDK Requests
+- Validate API Key
+- Validate Request
+- Publish Kafka Events
+- Decouple Client Applications
+
+---
+
+## 3. Apache Kafka
+
+Kafka is used as the event streaming platform.
+
+Responsibilities
+
+- Asynchronous Communication
+- Event Buffering
+- Loose Coupling
+- Scalability
+- Fault Tolerance
+
+Topics
+
+- Log Events
+- Dashboard Events
+
+---
+
+## 4. Log Ingestion Service
+
+The core processing engine of the platform.
+
+Responsibilities
+
+- Consume Kafka Events
+- Process Logs
+- Store Transactional Data
+- Index Elasticsearch
+- Generate Dashboard Analytics
+- Expose REST APIs
+
+---
+
+## 5. PostgreSQL
+
+Stores structured application data.
+
+Examples
+
+- Log Metadata
+- HTTP Traces
+- Exception Traces
+- Users
+- API Keys
+- Tenant Information
+
+---
+
+## 6. Elasticsearch
+
+Provides fast search capabilities.
+
+Used for
+
+- Full-text Search
+- Log Search
+- API Search
+- Exception Search
+- Filtering
+- Time Range Queries
+
+---
+
+## 7. Notification Service
+
+Provides real-time dashboard updates.
+
+Responsibilities
+
+- Consume Dashboard Events
+- Aggregate High-Frequency Events
+- Apply 1 Second Debouncing
+- Push WebSocket Notifications
+
+Benefits
+
+- Prevents Notification Flooding
+- Reduces UI Refreshes
+- Improves Dashboard Performance
+
+---
+
+## 8. Authentication Service
+
+Responsible for identity and security.
+
+Responsibilities
+
+- Registration
+- Login
+- JWT
+- Refresh Token
+- API Key Generation
+- API Key Regeneration
+- Tenant Provisioning
+
+---
+
+## 9. Angular Dashboard
+
+Provides visualization of application health.
+
+Modules
+
+- Dashboard
+- Traffic Insights
+- Log Search
+- API Key Management
+- Authentication
+- Log Details
+
+---
+
+# End-to-End Log Collection Flow
+
+```mermaid
+sequenceDiagram
+
+participant App as Client Application
+participant SDK as LogPulse SDK
+participant Producer
+participant Kafka
+participant Ingestion
+participant PostgreSQL
+participant Elasticsearch
+participant Notification
+participant Dashboard
+
+App->>SDK: HTTP Request
+
+SDK->>Producer: Log Event
+
+Producer->>Producer: Validate API Key
+
+Producer->>Kafka: Publish Event
+
+Kafka->>Ingestion: Consume Event
+
+Ingestion->>PostgreSQL: Persist Data
+
+Ingestion->>Elasticsearch: Index Document
+
+Ingestion->>Kafka: Publish Dashboard Event
+
+Kafka->>Notification: Consume Dashboard Event
+
+Notification->>Notification: Aggregate Events (1 sec)
+
+Notification->>Dashboard: WebSocket Update
+```
+
+---
+
+# Authentication Flow
+
+```mermaid
+sequenceDiagram
+
+participant User
+participant Dashboard
+participant Authentication
+participant Keycloak
+
+User->>Dashboard: Login
+
+Dashboard->>Authentication: Credentials
+
+Authentication->>Keycloak: Authenticate
+
+Keycloak-->>Authentication: JWT
+
+Authentication-->>Dashboard: Access Token
+```
+
+---
+
+# Multi-Tenant Architecture
+
+Each organization has isolated data.
+
+```text
+Tenant A
+│
+├── Schema A
+├── API Key A
+└── Users
+
+Tenant B
+│
+├── Schema B
+├── API Key B
+└── Users
+
+Tenant C
+│
+├── Schema C
+├── API Key C
+└── Users
+```
+
+Benefits
+
+- Data Isolation
+- Independent Migrations
+- Improved Security
+- Easy Scalability
+
+---
+
+# Event-Driven Processing
+
+```text
+SDK
+
+↓
+
+Producer Service
+
+↓
+
+Kafka
+
+↓
+
+Ingestion Service
+
+↓
+
+Dashboard Event
+
+↓
+
+Kafka
+
+↓
+
+Notification Service
+
+↓
+
+WebSocket
+
+↓
+
+Dashboard
+```
+
+---
+
+# Dashboard Data Flow
+
+```text
+Angular Dashboard
+
+↓
+
+REST API
+
+↓
+
+Log Ingestion Service
+
+↓
+
+PostgreSQL
+      +
+Elasticsearch
+
+↓
+
+Analytics Response
+
+↓
+
+Dashboard Charts
+```
+
+---
+
+# Technology Stack
+
+## Backend
+
+- Java
+- Spring Boot
+- Spring Security
+- Spring Kafka
+- Spring Data JPA
+- Spring Data Elasticsearch
+
+## Frontend
+
+- Angular
+- TypeScript
+- PrimeNG
+- Chart.js
+- Leaflet
+- RxJS
+
+## Infrastructure
+
+- Apache Kafka
+- PostgreSQL
+- Elasticsearch
+- Keycloak
+- Docker
+- Caddy
+
+---
+
+# Architectural Benefits
+
+- Event-driven communication
+- Loose coupling between services
+- Independent service deployment
+- Horizontal scalability
+- Full-text search with Elasticsearch
+- Multi-tenant architecture
+- Real-time dashboard updates
+- Secure authentication and authorization
+- Modular service design
+- Extensible platform for future integrations
+
+---
+
+# Future Architecture
+
+Planned enhancements include:
+
+- OpenTelemetry Distributed Tracing
+- Prometheus Metrics
+- Grafana Dashboards
+- Kubernetes Deployment
+- Alert Engine
+- Email Notifications
+- Slack Integration
+- AI-powered Log Analysis
+- Log Retention Policies
+- Distributed Cache (Redis)
+
+---
+
+# Related Documentation
+
+
+- [Platform Overview](../README.m)
+- [SDK Documentation](https://github.com/trace-sphere/log-consumer-sdk/blob/dev/README.md)
+- [Log Producer Service](https://github.com/trace-sphere/log-producer-service/blob/dev/README.md)
+- [Log Ingestion Service](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
+- [Notification Service](https://github.com/trace-sphere/trace-notification-service/blob/dev/README.md)
+- [Frontend Documentation](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
+
 # Authentication Service
 
 The **Authentication Service** is responsible for user authentication, authorization, tenant onboarding, API Key management, and secure access to the LogPulse platform.
