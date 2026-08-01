@@ -373,9 +373,9 @@ New Key Activated
 
 # Related Documentation
 
-- [Platform Overview](../README.md)
-- [SDK Documentation](sdk.md)
-- [Log Producer Service](log-producer.md)
-- [Log Ingestion Service](log-ingestion.md)
-- [Notification Service](notification.md)
-- [Frontend Documentation](frontend.md)
+- [Platform Overview](../README.m)
+- [SDK Documentation](https://github.com/trace-sphere/log-consumer-sdk/blob/dev/README.md)
+- [Log Producer Service]((https://github.com/trace-sphere/log-producer-service/blob/dev/README.md))
+- [Log Ingestion Service]((https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md))
+- [Notification Service]((https://github.com/trace-sphere/trace-notification-service/blob/dev/README.md))
+- [Frontend Documentation](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
