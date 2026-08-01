@@ -1,4 +1,4 @@
-# trace-sphere-docs
+# TRACE SPHERE DOCS
 Documentation states that the overall architecture and flow of the application
 # LogPulse
 
