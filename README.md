@@ -875,3 +875,258 @@ New Key Activated
 - [Log Ingestion Service](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
 - [Notification Service](https://github.com/trace-sphere/trace-notification-service/blob/dev/README.md)
 - [Frontend Documentation](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
+
+# Log Producer Service
+
+The **Log Producer Service** serves as the entry point for all log data entering the LogPulse platform. It receives log events from applications integrated with the LogPulse SDK, validates incoming requests using API Keys, enriches the payload with metadata, and publishes events asynchronously to Apache Kafka.
+
+By decoupling client applications from downstream processing, the Producer Service enables reliable, scalable, and event-driven log ingestion.
+
+---
+
+## Responsibilities
+
+- Receive log events from LogPulse SDK
+- Validate API Keys
+- Validate request payloads
+- Enrich log metadata
+- Publish events to Apache Kafka
+- Decouple client applications from backend processing
+
+---
+
+## High-Level Flow
+
+```text
+Client Application
+        │
+        ▼
+   LogPulse SDK
+        │
+        ▼
+Log Producer Service
+        │
+ API Key Validation
+        │
+        ▼
+   Apache Kafka
+```
+
+---
+
+## Technologies
+
+- Spring Boot
+- Spring Security
+- Apache Kafka
+- PostgreSQL
+- Keycloak
+- Docker
+
+---
+
+## Documentation
+
+For implementation details, API endpoints, configuration, and project structure, see:
+
+👉 **https://github.com/trace-sphere/log-producer-service/blob/dev/README.md**
+
+---
+
+## Related Documentation
+
+- [Platform Overview](../README.md)
+- [SDK Documentation](https://github.com/trace-sphere/log-consumer-sdk/blob/dev/README.md)
+- [Log Ingestion Service](https://github.com/trace-sphere/log-ingestion-service/blob/dev/README.md)
+
+# Log Ingestion Service
+
+The **Log Ingestion Service** is the core processing engine of the LogPulse platform. It consumes log events from Apache Kafka, processes and enriches them, persists structured data into PostgreSQL, indexes searchable documents into Elasticsearch, and exposes REST APIs that power the analytics dashboard.
+
+---
+
+## Responsibilities
+
+- Consume Kafka events
+- Process HTTP and application logs
+- Persist logs into PostgreSQL
+- Index documents into Elasticsearch
+- Generate analytics
+- Expose dashboard APIs
+
+---
+
+## High-Level Flow
+
+```text
+Apache Kafka
+      │
+Consume Event
+      ▼
+Log Ingestion Service
+      │
+ ├─────────────┐
+ ▼             ▼
+PostgreSQL Elasticsearch
+      │
+      ▼
+Dashboard APIs
+```
+
+---
+
+## Technologies
+
+- Spring Boot
+- Spring Kafka
+- PostgreSQL
+- Elasticsearch
+- Flyway
+- Docker
+
+---
+
+## Documentation
+
+For implementation details, APIs, analytics, search capabilities, and configuration:
+
+👉 **https://github.com/trace-sphere/log-ingestion-service/blob/dev/README.md**
+
+---
+
+## Related Documentation
+
+- [Platform Overview](../README.md)
+- [Log Producer Service](https://github.com/trace-sphere/log-producer-service/blob/dev/README.md)
+- [Notification Service](https://github.com/trace-sphere/trace-notification-service/blob/dev/README.md)
+
+# Notification Service
+
+The **Notification Service** enables real-time updates across the LogPulse platform. It consumes dashboard events from Apache Kafka, batches high-frequency events using a one-second debouncing strategy, and pushes aggregated notifications to connected clients through WebSocket.
+
+This minimizes unnecessary UI refreshes while providing near real-time dashboard updates.
+
+---
+
+## Responsibilities
+
+- Consume dashboard events
+- Aggregate high-frequency events
+- Apply 1-second debouncing
+- Publish WebSocket notifications
+- Reduce frontend update frequency
+
+---
+
+## High-Level Flow
+
+```text
+Log Ingestion Service
+        │
+Publish Dashboard Event
+        ▼
+Apache Kafka
+        ▼
+Notification Service
+        ▼
+Event Aggregation
+(1 Second)
+        ▼
+WebSocket
+        ▼
+Dashboard
+```
+
+---
+
+## Technologies
+
+- Spring Boot
+- Spring Kafka
+- WebSocket
+- STOMP
+
+---
+
+## Documentation
+
+For complete implementation details:
+
+👉 **https://github.com/trace-sphere/trace-notification-service/blob/dev/README.md**
+
+---
+
+## Related Documentation
+
+- [Platform Overview](../README.md)
+- [Log Ingestion Service](https://github.com/trace-sphere/log-ingestion-service/blob/dev/README.md)
+- [Frontend Documentation](https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md)
+
+- # LogPulse Web
+
+The **LogPulse Web** application is the user interface for the LogPulse platform. It provides centralized dashboards, traffic analytics, log exploration, API Key management, authentication, and real-time monitoring through an intuitive Angular-based interface.
+
+The frontend communicates with backend microservices using REST APIs and receives live updates through WebSocket.
+
+---
+
+## Features
+
+- Secure Login
+- Dashboard Analytics
+- Traffic Insights
+- Log Explorer
+- Exception Details
+- API Key Management
+- Real-Time Notifications
+- Responsive Design
+
+---
+
+## High-Level Flow
+
+```text
+Browser
+      │
+      ▼
+Angular Dashboard
+      │
+ REST APIs
+      │
+      ▼
+Log Ingestion Service
+      │
+      ▼
+PostgreSQL + Elasticsearch
+
+WebSocket
+      ▲
+Notification Service
+```
+
+---
+
+## Technologies
+
+- Angular
+- TypeScript
+- PrimeNG
+- Chart.js
+- RxJS
+- WebSocket
+
+---
+
+## Documentation
+
+For project structure, UI components, dashboard modules, authentication flow, and configuration:
+
+👉 **https://github.com/trace-sphere/log-ingestion-web/blob/dev/README.md**
+
+---
+
+## Related Documentation
+
+- [Platform Overview](../README.md)
+- [Authentication](authentication.md)
+- [SDK Documentation](https://github.com/trace-sphere/log-consumer-sdk/blob/dev/README.md)
