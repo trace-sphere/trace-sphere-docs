@@ -42,19 +42,12 @@ I-->J[Angular Dashboard]
 8. Angular dashboard displays analytics, search, and live updates.
 
 ## Repository Links
-- [SDK
-- Authentication Service
-- Producer Service
-- Ingestion Service
-- Notification Service
-- LogPulse Web
-
--[SDK](https://github.com/trace-sphere/log-consumer-sdk)
--[Authentication Service](https://github.com/trace-sphere/log-authentication-service)
--[Producer Service](https://github.com/trace-sphere/log-producer-service)
--[Ingestion Service](https://github.com/trace-sphere/log-ingestion-service)
--[Notification](https://github.com/trace-sphere/trace-notification-service)
--[Log trace web](https://github.com/trace-sphere/log-ingestion-web)
+- [SDK](https://github.com/trace-sphere/log-consumer-sdk)
+- [Authentication Service](https://github.com/trace-sphere/log-authentication-service)
+- [Producer Service](https://github.com/trace-sphere/log-producer-service)
+- [Ingestion Service](https://github.com/trace-sphere/log-ingestion-service)
+- [Notification](https://github.com/trace-sphere/trace-notification-service)
+- [Log trace web](https://github.com/trace-sphere/log-ingestion-web)
 
 ## Technology Stack
 Spring Boot, Angular, Kafka, Elasticsearch, PostgreSQL, Keycloak, Docker, Caddy, WebSocket.
